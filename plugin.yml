@@ -1,0 +1,10 @@
+name: ThumbsApply
+main: me.Todkommt.ThumbsApply.ThumbsApply
+version: 1.1
+website: http://www.minecraft-thumbs-up.de.tl
+author: Todkommt
+description: >
+             Automatic Guest Promoting
+commands:
+  apply:
+    description: Applicate yourself

@@ -1,0 +1,5 @@
+Installation Instructions:
+1. Drag the jar into your Bukkit plugin folder and start your server.
+2. Edit the config (/plugins/ThumbsApply/ThumbsApply.yml) to your likes.
+3. Add the permission node "thumbsapply.notguest" to your groups with building rights.
+4. Have fun!

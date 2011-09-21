@@ -11,30 +11,32 @@ import org.bukkit.event.player.*;
 
 public class ThumbsApplyPlayerListener extends PlayerListener
 {
-
-    public ThumbsApplyPlayerListener()
+	public ThumbsApplyPlayerListener()
     {
     }
 
     public void onPlayerJoin(PlayerJoinEvent event)
     {
     	Player player = event.getPlayer();
-    	if( ThumbsApply.inGroup(player) == true) {
-    		if(ThumbsApply.loginmessageenabled.equalsIgnoreCase("true")) {
-    		player.sendMessage(ChatColor.RED + "Hello, Guest. Please unlock yourself by typing /apply <password>.");
-    	}
+    	if( ThumbsApply.inGroup(player) == true)
+    	{
+    		if(ThumbsApply.loginmessageenabled.equalsIgnoreCase("true"))
+    		{
+    		player.sendMessage(ChatColor.GREEN + ThumbsApply.loginmessage + ThumbsApply.commandconf + ThumbsApply.passwordmsg);
+    	    }
     	}
     }
 
     public void onPlayerChat(PlayerChatEvent event)
     {
     	Player player = event.getPlayer();
-    	if(ThumbsApply.inGroup(player) == true) {
-    		if( ThumbsApply.chatblockenabled.equalsIgnoreCase("true")) {
-    			
-    		}
-    		player.sendMessage(ChatColor.RED + "You can't write as a guest. Please unlock yourself with /apply <password>.");
+    	if(ThumbsApply.inGroup(player) == true)
+    	{
+    		if( ThumbsApply.chatblockenabled.equalsIgnoreCase("true"))
+    		{
+    		player.sendMessage(ChatColor.RED + ThumbsApply.chatrestricted + ThumbsApply.commandconf + ThumbsApply.passwordmsg);
     		event.setCancelled(true);
+    		}
     	}
     }
 }

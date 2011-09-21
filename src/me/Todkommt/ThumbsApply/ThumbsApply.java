@@ -80,6 +80,7 @@ public class ThumbsApply extends JavaPlugin
                 config.setProperty(grpnmt, groupnametarget);
                 config.setProperty(logmsgen, loginmessageenabled);
                 config.setProperty(chtblken, chatblockenabled);
+                config.setProperty("variable.command", commandconf);
                 config.save();
                 System.out.println("[ThumbsApply] => File created!");
             }
@@ -87,9 +88,33 @@ public class ThumbsApply extends JavaPlugin
             {
                 e.printStackTrace();
             }
-        else {
+        else
+        {
         	loadFile();
         }
+        (new File(localizationDir)).mkdir();
+        if(!localization.exists())
+        {
+        	try
+        	{
+        		String root = "localization";
+        		localization.createNewFile();
+        		locconf.setProperty(root + ".wrongsender", wrongsender);
+        		locconf.setProperty(root + ".usage", usage);
+        		locconf.setProperty(root + ".success", success);
+        		locconf.setProperty(root + ".wrongpassword", wrongpw);
+        		locconf.setProperty(root + ".alreadyapplied", alreadyapplied);
+        		locconf.setProperty(root + ".loginmessage", loginmessage);
+        		locconf.setProperty(root + ".chatrestricted", chatrestricted);
+        		locconf.save();
+        		log.info("[ThumbsApply] => Localization Files created!");
+        	}
+        	catch(IOException e)
+        	{
+        		e.printStackTrace();
+        	}
+        }
+        else loadLocalizationFile();
         setupPermissions();
         PluginDescriptionFile pdfFile = getDescription();
         log.info((new StringBuilder("ThumbsApply v")).append(pdfFile.getVersion()).append(" enabled.").toString());
@@ -106,18 +131,32 @@ public class ThumbsApply extends JavaPlugin
         groupnametarget = config.getString(grpnmt, groupnametarget);
         loginmessageenabled = config.getString(logmsgen, loginmessageenabled);
         chatblockenabled = config.getString(chtblken, chatblockenabled);
+        commandconf = config.getString("variable.command", commandconf);
+    }
+    
+    public void loadLocalizationFile()
+    {
+    	String root = "localization";
+    	locconf.load();
+    	wrongsender = locconf.getString(root + ".wrongsender", wrongsender);
+    	usage = locconf.getString(root + ".usage", usage);
+    	success = locconf.getString(root + ".success", success);
+    	wrongpw = locconf.getString(root + ".wrongpassword", wrongpw);
+    	alreadyapplied = locconf.getString(root + ".alreadyapplied", alreadyapplied);
+    	loginmessage = locconf.getString(root + ".loginmessage", loginmessage);
+    	chatrestricted = locconf.getString(root + ".chatrestricted", chatrestricted);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String args[])
     {
         if(!(sender instanceof Player))
         {
-            sender.sendMessage(ChatColor.RED + "This command must be accessed by a player!");
+            sender.sendMessage(ChatColor.RED + wrongsender);
             return false;
         }
         command.getName();
         Player p = (Player)sender;
-        if(command.getName().equalsIgnoreCase("apply"))
+        if(command.getName().equalsIgnoreCase(commandconf))
         {
             p.getName();
             World w = p.getWorld();
@@ -130,7 +169,7 @@ public class ThumbsApply extends JavaPlugin
                 ColouredConsoleSender console = new ColouredConsoleSender((CraftServer)getServer());
                 if(args.length != 1)
                 {
-                    p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("Wrong usage. Right: /apply <password>").toString());
+                    p.sendMessage(ChatColor.RED + usage + commandconf + passwordmsg);
                     return false;
                 }
                 password1 = args[0];
@@ -138,19 +177,22 @@ public class ThumbsApply extends JavaPlugin
                 {
                     Object name = p.getName();
                     getServer().dispatchCommand(console, (new StringBuilder()).append("groupset ").append(name).append((new StringBuilder(" ")).append(groupnametarget).toString()).append(" *").toString());
-                    p.sendMessage((new StringBuilder()).append(ChatColor.GREEN).append("Success! You are now promoted.").toString());
+                    p.sendMessage((new StringBuilder()).append(ChatColor.GREEN).append(success).toString());
                     return true;
-                } else
+                }
+                else
                 {
-                    p.sendMessage((new StringBuilder()).append(ChatColor.RED).append("Wrong password!").toString());
+                    p.sendMessage((new StringBuilder()).append(ChatColor.RED).append(wrongpw).toString());
                     return false;
                 }
-            } else
+            }
+            else
             {
-                p.sendMessage(ChatColor.RED + "You are already promoted.");
+                p.sendMessage(ChatColor.RED + alreadyapplied);
                 return false;
             }
-        } else
+        }
+        else
         {
             return true;
         }
@@ -163,9 +205,10 @@ public class ThumbsApply extends JavaPlugin
         pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Priority.High, this);
     }
 
-    public static boolean inGroup(Player player) {
-		boolean group = permissionHandler.has(player, "thumbsapply.notguest");
-        if(group == false) {
+    public static boolean inGroup(Player player)
+    {
+        if(permissionHandler.has(player, "thumbsapply.notguest") == false)
+        {
         	return true;
         }
         else return false;
@@ -175,21 +218,35 @@ public class ThumbsApply extends JavaPlugin
     public static PermissionHandler permissionHandler;
     static Logger log;
     static String mainDir;
+    static String localizationDir;
     static File thumbsapply;
+    static File localization;
     static Configuration config;
+    static Configuration localizationconf;
     String password = "standard";
     String groupnametarget = "Builder";
     public static String loginmessageenabled = "true";
     public static String chatblockenabled = "false";
     public static int PermissionsPlugin;
     public static Boolean returned;
-
-    public static Configuration local;
+    public static String commandconf = "apply";
+    public static String wrongsender = "This command must be accessed by a player!";
+    public static String usage = "Wrong usage. Right: /";
+    public static String success = "Success! You are now promoted.";
+    public static String wrongpw = "Wrong password!";
+    public static String alreadyapplied = "You have already been promoted!";
+    public static String loginmessage = "Hello, Guest. Please unlock yourself by typing /";
+    public static String passwordmsg = " <password>.";
+    public static String chatrestricted = "You can't write as a guest. Please unlock yourself with /";
+    public static Configuration locconf;
     
     static 
     {
         mainDir = "plugins/ThumbsApply";
+        localizationDir = mainDir + "/localization";
         thumbsapply = new File((new StringBuilder(String.valueOf(mainDir))).append(File.separator).append("ThumbsApply.yml").toString());
         config = new Configuration(thumbsapply);
+        localization = new File(localizationDir + File.separator + "localization.yml");
+        locconf = new Configuration(localization);
     }
 }

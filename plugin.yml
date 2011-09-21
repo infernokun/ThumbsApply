@@ -1,6 +1,6 @@
 name: ThumbsApply
 main: me.Todkommt.ThumbsApply.ThumbsApply
-version: 1.1
+version: 1.2
 website: http://www.minecraft-thumbs-up.de.tl
 author: Todkommt
 description: >
@@ -8,3 +8,7 @@ description: >
 commands:
   apply:
     description: Applicate yourself
+permissions:
+    thumbsapply.notguest:
+        description: Shows that you are not a guest.
+        default: op

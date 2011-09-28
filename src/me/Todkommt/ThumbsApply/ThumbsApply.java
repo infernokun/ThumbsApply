@@ -8,6 +8,7 @@ package me.Todkommt.ThumbsApply;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import java.io.*;
+import java.util.HashMap;
 import java.util.logging.Logger;
 import org.bukkit.*;
 import org.bukkit.command.Command;
@@ -32,7 +33,7 @@ public class ThumbsApply extends JavaPlugin
         playerListener = null;
         log = Logger.getLogger("Minecraft");
     }
-
+    
     private void setupPermissions()
     {
         if(permissionHandler != null)
@@ -55,7 +56,7 @@ public class ThumbsApply extends JavaPlugin
             return;
         }
     }
-
+    
     public void onDisable()
     {
         log.info("ThumbsApply disabled.");
@@ -63,11 +64,33 @@ public class ThumbsApply extends JavaPlugin
 
     public void onEnable()
     {
-    	
+    	server = this.getServer();
     	playerListener = new ThumbsApplyPlayerListener();
         new ColouredConsoleSender((CraftServer)getServer());
         registerHooks();
         (new File(mainDir)).mkdir();
+    	if(!playtimefile.exists())
+    	{
+    		try
+    		{
+    			playtimefile.createNewFile();
+    		}
+    		catch(IOException e)
+    		{
+    			e.printStackTrace();
+    		}
+    		
+    	}
+    	else
+    	{
+    		loadPlayTime();
+    	}
+		PlaytimeCounter time = new PlaytimeCounter(); 
+		Thread timethread = new Thread(time);
+    	if(applytype.equalsIgnoreCase("time") && (timethread.isAlive() == false))
+    	{
+    		timethread.start(); 
+    	}
         if(!thumbsapply.exists())
             try
             {
@@ -81,6 +104,11 @@ public class ThumbsApply extends JavaPlugin
                 config.setProperty(logmsgen, loginmessageenabled);
                 config.setProperty(chtblken, chatblockenabled);
                 config.setProperty("variable.command", commandconf);
+                config.setProperty("variable2.password", password2);
+                config.setProperty("variable2.groupnametarget", groupnametarget2);
+                config.setProperty("option.doublegroupsenabled", doublegroup);
+                config.setProperty("option.applytype", applytype);
+                config.setProperty("variable.timetopromote", timetopromote);
                 config.save();
                 System.out.println("[ThumbsApply] => File created!");
             }
@@ -132,6 +160,11 @@ public class ThumbsApply extends JavaPlugin
         loginmessageenabled = config.getString(logmsgen, loginmessageenabled);
         chatblockenabled = config.getString(chtblken, chatblockenabled);
         commandconf = config.getString("variable.command", commandconf);
+        password2 = config.getString("variables2.password", password2);
+        groupnametarget2 = config.getString("variables2.groupnametarget", groupnametarget2);
+        doublegroup = config.getString("option.doublegroupsenabled", doublegroup);
+        applytype = config.getString("option.applytype", applytype);
+        timetopromote = config.getInt("variable.timetopromote", timetopromote);
     }
     
     public void loadLocalizationFile()
@@ -145,6 +178,41 @@ public class ThumbsApply extends JavaPlugin
     	alreadyapplied = locconf.getString(root + ".alreadyapplied", alreadyapplied);
     	loginmessage = locconf.getString(root + ".loginmessage", loginmessage);
     	chatrestricted = locconf.getString(root + ".chatrestricted", chatrestricted);
+    }
+    
+    @SuppressWarnings("unchecked")
+	public void loadPlayTime()
+    {
+    	try
+    	{
+    		FileInputStream f = new FileInputStream(playtimefile);  
+    		ObjectInputStream s = new ObjectInputStream(f);  
+    		playtime = (HashMap<String, Integer>)s.readObject();         
+    		s.close();
+    	}
+    	catch(IOException e)
+    	{
+    		e.printStackTrace();
+    	}
+    	catch(ClassNotFoundException e)
+    	{
+    		e.printStackTrace();
+    	}
+    }
+    
+    public static void writePlayTime()
+    {
+    	try
+    	{
+    		FileOutputStream f = new FileOutputStream(playtimefile);  
+    		ObjectOutputStream s = new ObjectOutputStream(f);          
+    		s.writeObject(playtime);
+    		s.flush();
+    	}
+    	catch(IOException e)
+    	{
+    		e.printStackTrace();
+    	}
     }
 
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String args[])
@@ -177,6 +245,13 @@ public class ThumbsApply extends JavaPlugin
                 {
                     Object name = p.getName();
                     getServer().dispatchCommand(console, (new StringBuilder()).append("groupset ").append(name).append((new StringBuilder(" ")).append(groupnametarget).toString()).append(" *").toString());
+                    p.sendMessage((new StringBuilder()).append(ChatColor.GREEN).append(success).toString());
+                    return true;
+                }
+                if(password1.equalsIgnoreCase(password2) && doublegroup.equalsIgnoreCase("true"))
+                {
+                    Object name = p.getName();
+                    getServer().dispatchCommand(console, "permissions player setgroup " + name + " " + groupnametarget2);
                     p.sendMessage((new StringBuilder()).append(ChatColor.GREEN).append(success).toString());
                     return true;
                 }
@@ -224,7 +299,7 @@ public class ThumbsApply extends JavaPlugin
     static Configuration config;
     static Configuration localizationconf;
     String password = "standard";
-    String groupnametarget = "Builder";
+    static String groupnametarget = "Builder";
     public static String loginmessageenabled = "true";
     public static String chatblockenabled = "false";
     public static int PermissionsPlugin;
@@ -238,7 +313,15 @@ public class ThumbsApply extends JavaPlugin
     public static String loginmessage = "Hello, Guest. Please unlock yourself by typing /";
     public static String passwordmsg = " <password>.";
     public static String chatrestricted = "You can't write as a guest. Please unlock yourself with /";
+    public static String password2 = "default";
+    public static String groupnametarget2 = "admin";
+    public static String doublegroup = "false";
     public static Configuration locconf;
+    public static HashMap<String, Integer> playtime = new HashMap<String, Integer>();
+    public static Server server;
+    public static File playtimefile;
+    public static String applytype = "time";
+    public static int timetopromote = 30;
     
     static 
     {
@@ -248,5 +331,6 @@ public class ThumbsApply extends JavaPlugin
         config = new Configuration(thumbsapply);
         localization = new File(localizationDir + File.separator + "localization.yml");
         locconf = new Configuration(localization);
+        playtimefile = new File(mainDir + File.separator + "playtime.dat");
     }
 }

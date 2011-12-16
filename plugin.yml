@@ -9,6 +9,6 @@ commands:
   apply:
     description: Applicate yourself
 permissions:
-    thumbsapply.notguest:
+    ThumbsApply.NotGuest:
         description: Shows that you are not a guest.
         default: op

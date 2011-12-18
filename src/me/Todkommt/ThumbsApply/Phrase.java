@@ -1,15 +1,18 @@
 package me.Todkommt.ThumbsApply;
 
 public enum Phrase {
-	SUCCESS("You were promoted successfully."),
-	GUEST_CHAT("You can't chat as a guest."),
-	JOIN_MESSAGE("Hello, $0. Please apply for user rank by using /$1 password."),
-	WRONG_PASSWORD("You entered the wrong password!"),
-	USAGE("Usage: /apply password"),
-	ALREADY_PROMOTED("You are already promoted!"),
-	NULL_COMMAND("That command doesn't exist!"),
-	THIS_IS_NOT_A_CONSOLE_COMMAND("You must be a player to use that command."),
-	HELP_PAGE("Commands: (Page $0)");
+	SUCCESS("SUCCESS"),
+	TIMED_PROMOTION_ENABLED("TIMED_PROMOTION_ENABLED"),
+	TIME_LEFT("TIME_LEFT"),
+	GUEST_CHAT("GUEST_CHAT"),
+	JOIN_MESSAGE_TIME("JOIN_MESSAGE_TIME"),
+	JOIN_MESSAGE_PASSWORD("JOIN_MESSAGE_PASSWORD"),
+	WRONG_PASSWORD("WRONG_PASSWORD"),
+	USAGE("USAGE"),
+	ALREADY_PROMOTED("ALREADY_PROMOTED"),
+	THIS_IS_NOT_A_CONSOLE_COMMAND("THIS_IS_NOT_A_CONSOLE_COMMAND");
+
+	public String confRoot = "messages.";
 	
 	private String message;
 	
@@ -22,7 +25,7 @@ public enum Phrase {
 	}
 	
 	private String getMessage(){
-		return message;
+		return ThumbsApply.plugin.getLocalizationConfig().getString(confRoot + message);
 	}
 	
 	public String parse(String... params){

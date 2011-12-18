@@ -1,0 +1,8 @@
+messages:
+    SUCCESS: You were promoted successfully.
+    GUEST_CHAT: You can't chat as a guest.
+    JOIN_MESSAGE: Hello, $0. Please apply for user rank by using /apply password.
+    WRONG_PASSWORD: You entered the wrong password!
+    USAGE: Usage: /apply password
+    ALREADY_PROMOTED: You are already promoted!
+    THIS_IS_NOT_A_CONSOLE_COMMAND: You must be a player to use that command.

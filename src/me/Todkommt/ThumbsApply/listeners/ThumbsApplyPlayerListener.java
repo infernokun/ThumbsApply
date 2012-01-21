@@ -31,16 +31,11 @@ public class ThumbsApplyPlayerListener extends PlayerListener {
 			{
 				if(plugin.getConfig().getBoolean("options.timedPromotion"))
 				{
-					String[] stuff = new String[2];
-					stuff[0] = event.getPlayer().getName();
-					stuff[1] = Integer.toString(plugin.getConfig().getInt("options.timeToPromote")*60000/plugin.getConfig().getInt("options.tickDelay"));
-					Messaging.send(event.getPlayer(), Phrase.JOIN_MESSAGE_TIME.parse(stuff));
+					Messaging.send(event.getPlayer(), Phrase.JOIN_MESSAGE_TIME.parse());
 				}
 				else
 				{
-				String[] stuff = new String[1];
-				stuff[0] = event.getPlayer().getName();
-				Messaging.send(event.getPlayer(), Phrase.JOIN_MESSAGE_PASSWORD.parse(stuff));
+				Messaging.send(event.getPlayer(), Phrase.JOIN_MESSAGE_PASSWORD.parse());
 				}
 			}
 		}
@@ -55,6 +50,12 @@ public class ThumbsApplyPlayerListener extends PlayerListener {
 		
 		if(!plugin.getPermissionsHandler().has(event.getPlayer(), "ThumbsApply.NotGuest"))
 		{
+			if(plugin.getConfig().getBoolean("options.timedPromotion"))
+			{
+				Messaging.send(event.getPlayer(), Phrase.TIME_TO_GO_CHAT.parse(Integer.toString(plugin.getConfig().getInt("options.timeToPromote")*60000/plugin.getConfig().getInt("options.tickDelay"))));
+				event.setCancelled(true);
+				return;
+			}
 			Messaging.send(event.getPlayer(), Phrase.GUEST_CHAT.parse());
 			event.setCancelled(true);
 		}

@@ -17,6 +17,7 @@ import me.Todkommt.ThumbsApply.permissions.PermissionsBukkit;
 import me.Todkommt.ThumbsApply.permissions.PermissionsHandler;
 import me.Todkommt.ThumbsApply.utils.PromotionTimer;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -39,11 +40,11 @@ public class ThumbsApply extends JavaPlugin {
 	File localizationFile = null;
 	File localizationDir = new File("plugins/ThumbsApply/localization");
 	public static ThumbsApply plugin;
-	public Runnable timer = new PromotionTimer(this);
+	public PromotionTimer timer = new PromotionTimer(this);
 	public Thread tickthread = new Thread(timer);
 	public static HashMap<Player, Integer> timeToPromote = new HashMap<Player, Integer>();
 	public File playerSaveFile = new File("plugins/ThumbsApply/SaveData" + File.separator + "SavedPlayers.dat");
-	public static int delay = 60000;
+	public int delay = 60000;
 	
 	public void onDisable() {
 		log.info("[ThumbsApply] disabled.");
@@ -102,7 +103,7 @@ public class ThumbsApply extends JavaPlugin {
 			Map.Entry<Player, Integer> entry = (Map.Entry<Player, Integer>)iterator.next();
 			if(entry.getKey().isOnline())
 			{
-			timeToPromote.put(entry.getKey(), entry.getValue()-1);
+				timeToPromote.put(entry.getKey(), entry.getValue()-1);
 			}
 			if(timeToPromote.get(entry.getKey()) <= 0)
 			{
@@ -115,6 +116,38 @@ public class ThumbsApply extends JavaPlugin {
 	
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args)
 	{
+		if(command.getName().equalsIgnoreCase("applyreload"))
+		{
+			if(!permissionsHandler.has(sender, "thumbsapply.reload"))
+			{
+				Messaging.send(sender, "You don't have permission to do that.");
+				return true;
+			}
+			reloadConfig();
+			sender.sendMessage(ChatColor.GREEN + "Successfully reloaded ThumbsApply config.");
+			return true;
+		}
+		if(command.getName().equalsIgnoreCase("applyrestart"))
+		{
+			if(!permissionsHandler.has(sender, "thumbsapply.restart"))
+			{
+				Messaging.send(sender, "You don't have permission to do that.");
+				return true;
+			}
+			if(!getConfig().getBoolean("options.timedPromotion"))
+			{
+				Messaging.send(sender, "Timed promotion not enabled.");
+				return true;
+			}
+			if(tickthread.isAlive())
+			{
+				Messaging.send(sender, "Thread was still running.");
+				timer.done();
+			}
+			tickthread.run();
+			Messaging.send(sender, "Thread was restarted.");
+			return true;
+		}
 		if(getConfig().getBoolean("options.timedPromotion"))
 		{
 			if(permissionsHandler.has(sender, "ThumbsApply.NotGuest"))
@@ -202,14 +235,17 @@ public class ThumbsApply extends JavaPlugin {
 	    String main = "messages.";
 	    localizationConfig.addDefault(main + "SUCCESS", "You were promoted successfully.");
 	    localizationConfig.addDefault(main + "GUEST_CHAT", "You can't chat as a guest.");
-	    localizationConfig.addDefault(main + "JOIN_MESSAGE_PASSWORD", "Hello, $0. Please apply for user rank by using /apply password.");
+	    localizationConfig.addDefault(main + "JOIN_MESSAGE_PASSWORD", "Hello, {player}. Please apply for user rank by using /apply password.");
 	    localizationConfig.addDefault(main + "JOIN_MESSAGE_TIME", "Hello, $0. You will be promoted to user rank in $1 minutes.");
 	    localizationConfig.addDefault(main + "WRONG_PASSWORD", "You entered the wrong password!");
 	    localizationConfig.addDefault(main + "USAGE", "Usage: /apply password");
 	    localizationConfig.addDefault(main + "ALREADY_PROMOTED", "You are already promoted!");
 	    localizationConfig.addDefault(main + "THIS_IS_NOT_A_CONSOLE_COMMAND", "You must be a player to use that command.");
-	    localizationConfig.addDefault(main + "TIMED_PROMOTION_ENABLED", "You server admin has enabled timed promotion.");
-	    localizationConfig.addDefault(main + "TIME_LEFT", "You have $0 minutes left until you get promoted.");
+	    localizationConfig.addDefault(main + "TIMED_PROMOTION_ENABLED", "Your server admin has enabled timed promotion.");
+	    localizationConfig.addDefault(main + "TIME_LEFT", "You have {timeleft} minutes left until you get promoted.");
+	    localizationConfig.addDefault(main + "NULL_COMMAND", "This command is not available.");
+	    localizationConfig.addDefault(main + "JOIN_MESSAGE_WEB", "Hello, {player}. Please apply for user rank on the homepage of this server.");
+	    localizationConfig.addDefault(main + "TIME_TO_GO_CHAT", "You have {timeleft} minutes left before you can chat.");
 	    localizationConfig.options().copyDefaults(true);
 	    try {
 			localizationConfig.save(localizationFile);
@@ -223,6 +259,11 @@ public class ThumbsApply extends JavaPlugin {
 	        reloadLocalizationConfig();
 	    }
 	    return localizationConfig;
+	}
+	
+	public static FileConfiguration APIgetConfig()
+	{
+		return null;
 	}
 	
 	public void saveLocalizationConfig() {

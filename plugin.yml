@@ -1,14 +1,24 @@
 name: ThumbsApply
 main: me.Todkommt.ThumbsApply.ThumbsApply
-version: 2.2
-website: http://www.minecraft-thumbs-up.de.tl
+version: 2.4.4
+website: http://www.famousserver.de
 author: Todkommt
 description: >
              Automatic Guest Promoting
 commands:
   apply:
     description: Applicate yourself
+  applyrestart:
+    description: Restart the timer thread.
+  applyreload:
+    description: Reload the Configuration.
 permissions:
     ThumbsApply.NotGuest:
         description: Shows that you are not a guest.
+        default: op
+    thumbsapply.restart:
+        description: Gives permission to restart the timer thread.
+        default: op
+    thumbsapply.reload:
+        description: Gives permission to reload the Config.
         default: op

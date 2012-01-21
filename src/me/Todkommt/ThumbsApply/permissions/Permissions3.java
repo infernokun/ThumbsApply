@@ -43,7 +43,9 @@ private ThumbsApply plugin;
 
 	public void setGroup(CommandSender sender, String group) {
 		CommandSender console = plugin.getServer().getConsoleSender();
+		String oldGroup = p3Handler.getPrimaryGroup(sender.getName(), sender.getName());
 		plugin.getServer().dispatchCommand(console, "pr " + sender.getName() + " parents add " + group);
+		plugin.getServer().dispatchCommand(console, "pr " + sender.getName() + " parents remove " + oldGroup);
 	}
 	
 }

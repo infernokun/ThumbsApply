@@ -19,11 +19,10 @@ private ThumbsApply plugin;
 		this.plugin = plugin;
 	}
 	
-	public boolean has(CommandSender sender, String permission) {
+	public boolean has(CommandSender sender, String permission, String world) {
 		if (sender instanceof Player){
 			Player player = (Player) sender;
-			
-			return p3Handler.has(player, permission);
+			return p3Handler.has(player.getName(), permission, world);
 		} else {
 			return true;
 		}
@@ -41,11 +40,16 @@ private ThumbsApply plugin;
 		return p3Handler.getUserSuffix(world, name);
 	}
 
-	public void setGroup(CommandSender sender, String group) {
+	public void setGroup(CommandSender sender, String group, String world) {
 		CommandSender console = plugin.getServer().getConsoleSender();
 		String oldGroup = p3Handler.getPrimaryGroup(sender.getName(), sender.getName());
-		plugin.getServer().dispatchCommand(console, "pr " + sender.getName() + " parents add " + group);
-		plugin.getServer().dispatchCommand(console, "pr " + sender.getName() + " parents remove " + oldGroup);
+		String worldmsg = "";
+		if(world != "")
+		{
+			worldmsg = " w:" + world;
+		}
+		plugin.getServer().dispatchCommand(console, "pr " + sender.getName() + " parents add " + group + worldmsg);
+		plugin.getServer().dispatchCommand(console, "pr " + sender.getName() + " parents remove " + oldGroup + worldmsg);
 	}
 	
 }

@@ -1,14 +1,20 @@
 package me.Todkommt.ThumbsApply.listeners;
 
+import java.util.HashMap;
+
 import me.Todkommt.ThumbsApply.Messaging;
 import me.Todkommt.ThumbsApply.Phrase;
 import me.Todkommt.ThumbsApply.ThumbsApply;
+import me.Todkommt.ThumbsApply.ThumbsApplyGroup;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 
-public class ThumbsApplyPlayerListener extends PlayerListener {
+public class ThumbsApplyPlayerListener implements Listener {
 
 	private ThumbsApply plugin;
 	
@@ -16,17 +22,25 @@ public class ThumbsApplyPlayerListener extends PlayerListener {
 		this.plugin = plugin;
 	}
 	
-	public void onPlayerJoin(PlayerJoinEvent event)
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onPlayerJoin(final PlayerJoinEvent event)
 	{
-		if(!plugin.getPermissionsHandler().has(event.getPlayer(), "ThumbsApply.NotGuest"))
-		{
-			if(plugin.getConfig().getBoolean("options.timedPromotion"))
+			if(plugin.timedPromotion)
 			{
 				if(!ThumbsApply.timeToPromote.containsKey(event.getPlayer()))
 				{
-					ThumbsApply.timeToPromote.put(event.getPlayer(), plugin.getConfig().getInt("options.timeToPromote")/(60000/plugin.getConfig().getInt("options.tickDelay")));
+					HashMap<String, Integer> groups = new HashMap<String, Integer>();
+					for(ThumbsApplyGroup group : plugin.groups)
+					{
+						if(group.isTimed && !plugin.getPermissionsHandler().has(event.getPlayer(), "group." + group.group, group.world))
+							groups.put(group.group, group.time*(60000/plugin.delay));
+					}
+					ThumbsApply.timeToPromote.put((OfflinePlayer)event.getPlayer(), groups);
+					plugin.timedSave(true);
 				}
 			}
+		if(!plugin.getPermissionsHandler().has(event.getPlayer(), "ThumbsApply.NotGuest", ""))
+		{
 			if(plugin.getConfig().getBoolean("options.joinMessageEnabled"))
 			{
 				if(plugin.getConfig().getBoolean("options.timedPromotion"))
@@ -41,14 +55,15 @@ public class ThumbsApplyPlayerListener extends PlayerListener {
 		}
 	}
 	
-	public void onPlayerChat(PlayerChatEvent event)
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onPlayerChat(final PlayerChatEvent event)
 	{
 		if(!plugin.getConfig().getBoolean("options.chatBlockEnabled"))
 		{
 			return;
 		}
 		
-		if(!plugin.getPermissionsHandler().has(event.getPlayer(), "ThumbsApply.NotGuest"))
+		if(!plugin.getPermissionsHandler().has(event.getPlayer(), "ThumbsApply.NotGuest", ""))
 		{
 			if(plugin.getConfig().getBoolean("options.timedPromotion"))
 			{

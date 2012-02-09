@@ -18,19 +18,22 @@ public class PEX implements PermissionsHandler {
 		this.plugin = plugin;
 	}
 	
-	public boolean has(CommandSender sender, String permission){
+	public boolean has(CommandSender sender, String permission, String world){
 		if (sender instanceof Player){
 			Player player = (Player) sender;
-			
-			return pexHandler.has(player, permission);
+			if(world != "")
+				return pexHandler.has(player, permission);
+			else
+				return pexHandler.has(player, permission, world);
 		} else {
 			return true;
 		}
 	}
 	
-	public void setGroup(CommandSender sender, String groupname)
+	public void setGroup(CommandSender sender, String groupname, String world)
 	{
 		CommandSender console = plugin.getServer().getConsoleSender();
-		plugin.getServer().dispatchCommand(console, "pex user " + sender.getName() + " group set " + groupname);
+		world = " " + world;
+		plugin.getServer().dispatchCommand(console, "pex user " + sender.getName() + " group set " + groupname + world);
 	}
 }

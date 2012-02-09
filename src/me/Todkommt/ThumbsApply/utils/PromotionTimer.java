@@ -11,21 +11,7 @@ public class PromotionTimer implements Runnable {
 		this.plugin = plugin;
 	}
 	
-	private boolean threadDone = false;
-
-    public void done() {
-        threadDone = true;
-    }
-	
 	public void run() {
-		while(!threadDone)
-		{
-			plugin.update();
-			try {
-				Thread.sleep(plugin.delay);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		plugin.update();
 	}
 }

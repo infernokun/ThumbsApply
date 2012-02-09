@@ -15,24 +15,27 @@ public class GroupManagerHandler implements PermissionsHandler {
 		this.plugin = plugin;
 	}
 	
-	public boolean has(CommandSender sender, String permission) {
+	public boolean has(CommandSender sender, String permission, String world) {
 		if(sender instanceof Player)
 		{
 			GroupManager gm = (GroupManager)plugin.getServer().getPluginManager().getPlugin("GroupManager");
 			if(gm != null)
 			{
-				if(gm.getWorldsHolder().getWorldPermissions((Player)sender).has((Player)sender, permission))
+				if(world != "")
 				{
-					return true;
+					return gm.getWorldsHolder().getWorldPermissions(world).has((Player)sender, permission);
 				}
-				else return false;
+				else
+				{
+					return gm.getWorldsHolder().getWorldPermissions((Player)sender).has((Player)sender, permission);
+				}
 			}
 			else return false;
 		}
 		else return true;
 	}
 
-	public void setGroup(CommandSender sender, String group) {
+	public void setGroup(CommandSender sender, String group, String world) {
 		CommandSender console = plugin.getServer().getConsoleSender();
 		plugin.getServer().dispatchCommand(console, "manuadd " + sender.getName() + " " + group);
 	}

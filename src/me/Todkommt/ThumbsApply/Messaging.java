@@ -2,7 +2,6 @@ package me.Todkommt.ThumbsApply;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 public class Messaging {
 
@@ -31,9 +30,23 @@ private static ChatColor color = ChatColor.YELLOW;
 		}
 		
 		message = message.replaceAll("\\{player\\}", sender.getName());
-		if(ThumbsApply.timeToPromote.containsKey((Player)sender))
-			if(ThumbsApply.timeToPromote.get((Player)sender) != null)
-				message = message.replaceAll("\\{timeleft\\}", Integer.toString((ThumbsApply.timeToPromote.get((Player)sender)/(60000/plugin.getConfig().getInt("options.tickDelay")))));
+/*		if(ThumbsApply.timeToPromote.containsKey((OfflinePlayer)sender))
+		{
+			int time = 0;
+			String group = "";
+			Iterator<Entry<String, Integer>> it = ThumbsApply.timeToPromote.get((OfflinePlayer)sender).entrySet().iterator();
+			while(it.hasNext())
+			{
+				Entry<String, Integer> entry = it.next();
+				if(entry.getValue() < time || time == 0)
+				{
+					time = entry.getValue();
+					group = entry.getKey();
+				}
+			}
+			message = message.replaceAll("\\{timeleft\\}", Integer.toString(time*(60000/plugin.delay)));
+			message = message.replaceAll("\\{group\\}", group);
+		} */
 		message = colorize(message);
 		sender.sendMessage(color + message);
 	}

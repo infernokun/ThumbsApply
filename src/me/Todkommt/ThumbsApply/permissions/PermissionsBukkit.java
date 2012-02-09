@@ -14,7 +14,7 @@ public class PermissionsBukkit implements PermissionsHandler {
 		this.plugin = plugin;
 	}
 	
-	public boolean has(CommandSender sender, String permission) {
+	public boolean has(CommandSender sender, String permission, String world) {
 		if(sender instanceof Player)
 		{
 			Player player = (Player)sender;
@@ -27,7 +27,7 @@ public class PermissionsBukkit implements PermissionsHandler {
 		else return true;
 	}
 
-	public void setGroup(CommandSender sender, String group) {
+	public void setGroup(CommandSender sender, String group, String world) {
 		CommandSender console = plugin.getServer().getConsoleSender();
 		plugin.getServer().dispatchCommand(console, "permissions player setgroup " + sender.getName() + " " + group);
 	}

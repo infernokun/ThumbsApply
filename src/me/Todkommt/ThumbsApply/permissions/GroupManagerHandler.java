@@ -37,7 +37,13 @@ public class GroupManagerHandler implements PermissionsHandler {
 
 	public void setGroup(CommandSender sender, String group, String world) {
 		CommandSender console = plugin.getServer().getConsoleSender();
-		plugin.getServer().dispatchCommand(console, "manuadd " + sender.getName() + " " + group);
+		if(world == "")
+			plugin.getServer().dispatchCommand(console, "manuadd " + sender.getName() + " " + group);
+		else
+		{
+			plugin.getServer().dispatchCommand(console, "manselect " + world);
+			plugin.getServer().dispatchCommand(console, "manuadd " + sender.getName() + " " + group);
+		}
 	}
 
 }

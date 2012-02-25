@@ -1,5 +1,14 @@
 package me.Todkommt.ThumbsApply;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+
+import me.Todkommt.ThumbsApply.utils.MsgBuffer;
+import me.Todkommt.ThumbsApply.utils.Replacement;
+import me.Todkommt.ThumbsApply.utils.ThumbsApplyModule;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -8,6 +17,20 @@ public class Messaging {
 private static ChatColor color = ChatColor.YELLOW;
 	
 	public static ThumbsApply plugin;
+	public static HashMap<ThumbsApplyModule, HashMap<String, Replacement>> replacements = new HashMap<ThumbsApplyModule, HashMap<String, Replacement>>();
+	public static List<String> joinMessages = new ArrayList<String>();
+	public static HashMap<CommandSender, MsgBuffer> msgBuffer = new HashMap<CommandSender, MsgBuffer>();
+	
+	public static void sendMsgBuffer()
+	{
+		for(Entry<CommandSender, MsgBuffer> entry : msgBuffer.entrySet())
+		{
+			MsgBuffer buffer = entry.getValue();
+			CommandSender sender = entry.getKey();
+			send(sender, buffer.msg, buffer.module);
+		}
+		msgBuffer.clear();
+	}
 	
 	public static void setPlugin(ThumbsApply plugin)
 	{
@@ -18,37 +41,51 @@ private static ChatColor color = ChatColor.YELLOW;
 		color = configColor;
 	}
 	
-	public static void sendWithPrefix(CommandSender sender, String message, String... params){
-		send(sender, "[nSpleef] " + message, params);
+	public static void sendWithPrefix(CommandSender sender, String message, ThumbsApplyModule... params){
+		send(sender, "[ThumbsApply] " + message, params);
 	}
 	
-	public static void send(CommandSender sender, String message, String... params){
-		if (params != null){
-			for (int i = 0; i < params.length; i++){
-				message = message.replace("$" + (i + 1), params[i]);
-			}
-		}
+	public static void send(CommandSender sender, String message, ThumbsApplyModule... params){
 		
 		message = message.replaceAll("\\{player\\}", sender.getName());
-/*		if(ThumbsApply.timeToPromote.containsKey((OfflinePlayer)sender))
+		if(params.length == 1)
 		{
-			int time = 0;
-			String group = "";
-			Iterator<Entry<String, Integer>> it = ThumbsApply.timeToPromote.get((OfflinePlayer)sender).entrySet().iterator();
-			while(it.hasNext())
+			ThumbsApplyModule module = params[0];
+			if(module != null)
 			{
-				Entry<String, Integer> entry = it.next();
-				if(entry.getValue() < time || time == 0)
+				message = message.replaceAll("\\{group\\}", module.group);
+				message = message.replaceAll("\\{world\\}", module.world);
+				if(replacements.containsKey(module))
 				{
-					time = entry.getValue();
-					group = entry.getKey();
+					for(Entry<String, Replacement> entry : replacements.get(module).entrySet())
+					{
+						String key = entry.getKey();
+						Replacement method = entry.getValue();
+						message = message.replaceAll(key, (String)method.replace(sender));
+					}
 				}
 			}
-			message = message.replaceAll("\\{timeleft\\}", Integer.toString(time*(60000/plugin.delay)));
-			message = message.replaceAll("\\{group\\}", group);
-		} */
+		}
 		message = colorize(message);
-		sender.sendMessage(color + message);
+		sender.sendMessage(message);
+	}
+	
+	public static String localize(String key)
+	{
+		if(ThumbsApply.instance.externalLocals.containsKey(key))
+		{
+			String msg = ThumbsApply.instance.externalLocals.get(key);
+			return msg;
+		}
+		else return key;
+	}
+	
+	public static void sendJoinMessage(CommandSender sender)
+	{
+		for(String msg : joinMessages)
+		{
+			sender.sendMessage(color + msg);
+		}
 	}
 	
 	public static String colorize(String s){

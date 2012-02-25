@@ -2,17 +2,13 @@ package me.Todkommt.ThumbsApply;
 
 public enum Phrase {
 	SUCCESS("SUCCESS"),
-	TIMED_PROMOTION_ENABLED("TIMED_PROMOTION_ENABLED"),
-	TIME_LEFT("TIME_LEFT"),
 	GUEST_CHAT("GUEST_CHAT"),
-	JOIN_MESSAGE_TIME("JOIN_MESSAGE_TIME"),
 	JOIN_MESSAGE_PASSWORD("JOIN_MESSAGE_PASSWORD"),
 	WRONG_PASSWORD("WRONG_PASSWORD"),
 	USAGE("USAGE"),
 	ALREADY_PROMOTED("ALREADY_PROMOTED"),
 	NULL_COMMAND("NULL_COMMAND"),
-	JOIN_MESSAGE_WEB("JOIN_MESSAGE_WEB"),
-	TIME_TO_GO_CHAT("TIME_TO_GO_CHAT"),
+	UNKNOWN_ERROR("UNKNOWN_ERROR"),
 	THIS_IS_NOT_A_CONSOLE_COMMAND("THIS_IS_NOT_A_CONSOLE_COMMAND");
 
 	public String confRoot = "messages.";
@@ -28,7 +24,7 @@ public enum Phrase {
 	}
 	
 	private String getMessage(){
-		return ThumbsApply.plugin.getLocalizationConfig().getString(confRoot + message);
+		return ThumbsApply.instance.getLocalizationConfig().getString(confRoot + message);
 	}
 	
 	public String parse(String... params){

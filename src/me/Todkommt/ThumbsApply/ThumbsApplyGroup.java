@@ -1,18 +1,16 @@
 package me.Todkommt.ThumbsApply;
 
+import me.Todkommt.ThumbsApply.utils.ThumbsApplyModule;
+
 public class ThumbsApplyGroup {
 
-	public int time;
-	public boolean isTimed;
-	public String password;
+	public ThumbsApplyModule method;
 	public String group;
 	public String world;
 	
-	public ThumbsApplyGroup(int time, boolean isTimed, String password, String group, String world)
+	public ThumbsApplyGroup(ThumbsApplyModule method, String group, String world)
 	{
-		this.time = time;
-		this.isTimed = isTimed;
-		this.password = password;
+		this.method = method;
 		this.group = group;
 		this.world = world;
 	}
